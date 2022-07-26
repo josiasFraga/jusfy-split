@@ -28,6 +28,7 @@ app.use(bodyParser({defer: true}));
 
         console.info('..validando arquivo');
         console.log(files);
+        console.log(fields);
         if ( typeof(files.fileUploaded) == 'undefined' || typeof(files.fileUploaded.mimetype) == 'undefined' || files.fileUploaded.mimetype != 'application/pdf') {
             return res.end(JSON.stringify({ 'status': 'error', 'message': 'Arquivo inválido.' }));
         }
