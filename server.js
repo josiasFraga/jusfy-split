@@ -29,17 +29,13 @@ app.use(bodyParser({defer: true}));
         res.setHeader('Content-Type', 'application/json');
 
         console.info('..validando arquivo');
-
-        console.log(fields);
-        console.log(files);
-
-        if ( typeof(files) == 'undefined' || typeof(files.fileUploaded) == 'undefined' || typeof(files.fileUploaded.mimetype) == 'undefined' || files.fileUploaded.mimetype != 'application/pdf') {
+        if ( Object.entries(files).length === 0 || typeof(files.fileUploaded) == 'undefined' || typeof(files.fileUploaded.mimetype) == 'undefined' || files.fileUploaded.mimetype != 'application/pdf') {
             return res.end(JSON.stringify({ 'status': 'error', 'message': 'Arquivo inválido.' }));
         }
         console.info('arquivo validado');
 
         console.info('..validando tamanho');
-        if ( typeof(fields.maxsize) == 'undefined' || parseInt(fields.maxsize) <= 0.99 ) {
+        if ( Object.entries(fields).length === 0 || typeof(fields.maxsize) == 'undefined' || parseInt(fields.maxsize) <= 0.99 ) {
             return res.end(JSON.stringify({ 'status': 'error', 'message': 'Tamanho inválido.' }));
         }
         console.info('tamanho validado');
