@@ -30,6 +30,7 @@ app.use(bodyParser({defer: true}));
 
         console.info('..validando arquivo');
         if ( Object.entries(files).length === 0 || typeof(files.fileUploaded) == 'undefined' || typeof(files.fileUploaded.mimetype) == 'undefined' || files.fileUploaded.mimetype != 'application/pdf') {
+            console.log('entrou no retorno');
             return res.end(JSON.stringify({ 'status': 'error', 'message': 'Arquivo inválido.' }));
         }
         console.info('arquivo validado');
