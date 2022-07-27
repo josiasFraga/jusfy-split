@@ -5,10 +5,12 @@ var path = require('path');     //used for file path
 var fs =require('fs-extra');    //File System-needed for renaming file etc
 const spawn = require("child_process").spawnSync;
 const { v4: uuidv4 } = require('uuid');
+const cors = require('cors');
 
 //uuidv4()
 
 var app = express();
+app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
 /* ========================================================== 
