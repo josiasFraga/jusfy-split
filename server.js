@@ -30,7 +30,10 @@ app.use(bodyParser({defer: true}));
 
         console.info('..validando arquivo');
 
-        if ( typeof(files.fileUploaded) == 'undefined' || typeof(files.fileUploaded.mimetype) == 'undefined' || files.fileUploaded.mimetype != 'application/pdf') {
+        console.log(fields);
+        console.log(files);
+
+        if ( typeof(files) == 'undefined' || typeof(files.fileUploaded) == 'undefined' || typeof(files.fileUploaded.mimetype) == 'undefined' || files.fileUploaded.mimetype != 'application/pdf') {
             return res.end(JSON.stringify({ 'status': 'error', 'message': 'Arquivo inválido.' }));
         }
         console.info('arquivo validado');
