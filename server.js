@@ -17,7 +17,8 @@ app.use(express.static(path.join(__dirname, 'public')));
  bodyParser() required to allow Express to see the uploaded files
 ============================================================ */
 app.use(bodyParser({defer: true}));
- app.route('/upload')
+
+app.route('/upload')
  .post(function (req, res, next) {
 
   var form = new formidable.IncomingForm();
@@ -102,6 +103,28 @@ app.use(bodyParser({defer: true}));
             
         });
     });
+});
+
+app.route('/download')
+.get(function (req, res, next) {
+
+    if ( typeof(req.query.directory) == `undefined` ) {
+        res.setHeader('Content-Type', 'application/json');
+        return res.end(JSON.stringify({ 'status': 'error', 'message': 'Diretório não informado.' }));
+    }
+
+    if ( typeof(req.query.file) == `undefined` ) {
+        res.setHeader('Content-Type', 'application/json');
+        return res.end(JSON.stringify({ 'status': 'error', 'message': 'Arquivo não informado.' }));
+    }
+
+    var directory = req.query.directory;
+    var file = req.query.file;
+
+    var data =fs.readFileSync('./files/' + directory + '/' + file);
+    res.contentType("application/pdf");
+    return res.send(data);
+
 });
 var server = app.listen(3030, function() {
 console.log('Listening on port %d', server.address().port);
