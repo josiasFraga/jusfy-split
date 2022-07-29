@@ -3,7 +3,8 @@ var bodyParser = require('body-parser'); //connects bodyParsing middleware
 var formidable = require('formidable');
 var path = require('path');     //used for file path
 var fs =require('fs-extra');    //File System-needed for renaming file etc
-const spawn = require("child_process").spawnSync;
+const spawn = require("child_process").spawn;
+const exec = require("child_process").exec;
 const { v4: uuidv4 } = require('uuid');
 const cors = require('cors');
 
@@ -65,42 +66,47 @@ app.route('/upload')
             console.info('arquivo salvo');
             console.info('..dividindo arquivo em pedaços de ' + maxSize + 'MB');
 
-            spawn("pdf-split-tool", [
-                destination,
-                '--max-size',
-                maxSize,
-            ]);
-
-            console.log('arquivo dividido');
-            console.info('..Lendo conteúdo da pasta');
-
-            let files = [];
-
-            fs.readdirSync(processDir).forEach(splitted_file_name => {
-
-                if ( splitted_file_name == originalFilename ) {//skip roriginal file
-                    return;
+            let python_process = exec(`pdf-split-tool "${destination}" --max-size ${maxSize}`);
+            
+            python_process.stdout.on("data",function(data){
+                if (data.includes('Do you want to continue?')) {
+                    python_process.stdin.write("y");
+                    python_process.stdin.write("\n");
                 }
-
-                const stats = fs.statSync(processDir  + '/' + splitted_file_name);
-                const fileSizeInBytes = stats.size;
-                const fileSizeInMegaBytes = fileSizeInBytes / (1024*1024);
-
-                files.push({
-                    'file_name': splitted_file_name,
-                    'file_size': fileSizeInMegaBytes.toFixed(2) + 'MB',
-                });
             });
 
-            console.log('Processo finalizado');
+            python_process.stdout.on("close",function(data){
 
-            return res.end(JSON.stringify({ 
-                'status': 'ok', 
-                'directory': uuid_generated,
-                'fileName': originalFilename,
-                'splitted_file': files,
-            }));
-            
+                console.log('arquivo dividido');
+                console.info('..Lendo conteúdo da pasta');
+                
+                let files = [];
+    
+                fs.readdirSync(processDir).forEach(splitted_file_name => {
+    
+                    if ( splitted_file_name == originalFilename ) {//skip roriginal file
+                        return;
+                    }
+    
+                    const stats = fs.statSync(processDir  + '/' + splitted_file_name);
+                    const fileSizeInBytes = stats.size;
+                    const fileSizeInMegaBytes = fileSizeInBytes / (1024*1024);
+    
+                    files.push({
+                        'file_name': splitted_file_name,
+                        'file_size': fileSizeInMegaBytes.toFixed(2) + 'MB',
+                    });
+                });
+    
+                console.log('Processo finalizado');
+    
+                return res.end(JSON.stringify({ 
+                    'status': 'ok', 
+                    'directory': uuid_generated,
+                    'fileName': originalFilename,
+                    'splitted_file': files,
+                }));
+            });
         });
     });
 });
