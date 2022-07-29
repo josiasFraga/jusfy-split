@@ -19,6 +19,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 ============================================================ */
 app.use(bodyParser({defer: true}));
 
+app.route('/').get((req, res, nex)=>{
+    return res.status(200).json({success: true});
+});
+
 app.route('/upload')
  .post(function (req, res, next) {
 
